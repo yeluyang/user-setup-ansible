@@ -1,0 +1,8 @@
+---
+- hosts: nodes
+  remote_user: root
+  tasks:
+    - name: check inventory
+      debug:
+        msg: "{{ hostvars }}"
+      check_mode: yes
