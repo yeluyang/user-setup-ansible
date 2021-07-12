@@ -1,0 +1,23 @@
+---
+- name: get miniconda3 installer under {{ user_home }}
+  become: yes
+  become_user: "{{ user.name }}"
+  vars:
+    - conda_url:
+        Debian: https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+        RedHat: https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+        Darwin: https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
+  get_url:
+    url: "{{ conda_url[ansible_os_family] }}"
+    dest: "{{ user_home }}/.miniconda-installer.sh"
+    owner: "{{ user.name }}"
+    group: "{{ user.name }}"
+    mode: "0755"
+
+- name: install miniconda3 for {{ user.name }}
+  become: yes
+  become_user: "{{ user.name }}"
+  shell:
+    cmd: "{{ user_home }}/.miniconda-installer.sh -b -p {{ user_home }}/.miniconda3"
+    chdir: "{{ user_home }}"
+    creates: "{{ user_home }}/.miniconda3"

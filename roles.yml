@@ -72,6 +72,17 @@
     - golang
     - langs
 
+- name: setup python for {{ user.name }}
+  include_role:
+    name: python
+    apply:
+      tags:
+        - python
+        - langs
+  tags:
+    - python
+    - langs
+
 - name: setup docker for {{ user.name }}
   include_role:
     name: docker
