@@ -21,3 +21,24 @@
     cmd: "{{ user_home }}/.miniconda-installer.sh -b -p {{ user_home }}/.miniconda3"
     chdir: "{{ user_home }}"
     creates: "{{ user_home }}/.miniconda3"
+
+- name: create miniconda profile {{ user_home }}/.condarc
+  become: yes
+  become_user: "{{ user.name }}"
+  file:
+    path: "{{ user_home }}/.condarc"
+    state: touch
+    owner: "{{ user.name }}"
+    group: "{{ user.name }}"
+    mode: "0644"
+    modification_time: preserve
+    access_time: preserve
+
+- name: setup miniconda for {{ user.name }}
+  become: yes
+  become_user: "{{ user.name }}"
+  blockinfile:
+    path: "{{ user_home }}/.condarc"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK user_setup/{{ role_name }}/setup_miniconda_config"
+    block: |
+      auto_activate_base: false
