@@ -56,16 +56,13 @@
     path: "{{ user_home }}/{{ user_profile }}"
     marker: "# {mark} ANSIBLE MANAGED BLOCK user_setup/{{ role_name }}/setup_profile"
     block: |
-      PROXY_SOCKS_ENDPOINT=socks5://${PROXY_SERVER_IP}:${PROXY_SOCKS_PORT}
-      PROXY_HTTP_ENDPOINT=http://${PROXY_SERVER_IP}:${PROXY_HTTP_PORT}
-      PROXY_HTTPS_ENDPOINT=https://${PROXY_SERVER_IP}:${PROXY_HTTPS_PORT}
       alias proxy="
-              export all_proxy=${PROXY_SOCKS_ENDPOINT};
-              export ALL_PROXY=${PROXY_SOCKS_ENDPOINT};
-              export http_proxy=${PROXY_HTTP_ENDPOINT};
-              export HTTP_PROXY=${PROXY_HTTP_ENDPOINT};
-              export https_proxy=${PROXY_HTTPS_ENDPOINT};
-              export HTTPS_PROXY=${PROXY_HTTPS_ENDPOINT};
+              export all_proxy=socks5://${PROXY_SOCKS_ENDPOINT};
+              export ALL_PROXY=socks5://${PROXY_SOCKS_ENDPOINT};
+              export http_proxy=http://${PROXY_HTTP_ENDPOINT};
+              export HTTP_PROXY=http://${PROXY_HTTP_ENDPOINT};
+              export https_proxy=http://${PROXY_HTTP_ENDPOINT};
+              export HTTPS_PROXY=http://${PROXY_HTTP_ENDPOINT};
               "
 
       alias unproxy="
