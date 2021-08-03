@@ -56,9 +56,11 @@
     apply:
       tags:
         - rust
+        - rs
         - langs
   tags:
     - rust
+    - rs
     - langs
 
 - name: setup golang for {{ user.name }}
@@ -67,9 +69,11 @@
     apply:
       tags:
         - golang
+        - go
         - langs
   tags:
     - golang
+    - go
     - langs
 
 - name: setup python for {{ user.name }}
@@ -78,9 +82,11 @@
     apply:
       tags:
         - python
+        - py
         - langs
   tags:
     - python
+    - py
     - langs
 
 - name: setup docker for {{ user.name }}
