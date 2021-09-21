@@ -9,7 +9,7 @@
     - include_tasks: roles.yml
       vars:
         - user_home: /home/{{ user.name }}
-        - user_profile: ".common.profile"
+        - user_profile: ".{{ user.name }}.common.profile"
       loop: "{{ users }}"
       loop_control:
         loop_var: user

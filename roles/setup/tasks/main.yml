@@ -49,41 +49,31 @@
     modification_time: preserve
     access_time: preserve
 
-- name: setup user profile {{ user_home }}/{{ user_profile }}
+- name: setup user env {{ user_home }}/.{{ user.name }}.env.profile
+  become: yes
+  become_user: "{{ user.name }}"
+  template:
+    src: env.profile.j2
+    dest: "{{ user_home }}/.{{ user.name }}.env.profile"
+    owner: "{{ user.name }}"
+    group: "{{ user.name }}"
+    mode: "0644"
+
+- name: include user env into {{ user_profile }}
   become: yes
   become_user: "{{ user.name }}"
   blockinfile:
     path: "{{ user_home }}/{{ user_profile }}"
-    marker: "# {mark} ANSIBLE MANAGED BLOCK user_setup/{{ role_name }}/setup_profile"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK user_setup/{{ role_name }}/env"
     block: |
-      alias proxy="
-              export all_proxy=socks5://${PROXY_SOCKS_ENDPOINT};
-              export ALL_PROXY=socks5://${PROXY_SOCKS_ENDPOINT};
-              export http_proxy=http://${PROXY_HTTP_ENDPOINT};
-              export HTTP_PROXY=http://${PROXY_HTTP_ENDPOINT};
-              export https_proxy=http://${PROXY_HTTP_ENDPOINT};
-              export HTTPS_PROXY=http://${PROXY_HTTP_ENDPOINT};
-              "
-
-      alias unproxy="
-              unset all_proxy;
-              unset ALL_PROXY;
-              unset http_proxy;
-              unset HTTP_PROXY;
-              unset https_proxy;
-              unset HTTPS_PROXY;
-              "
-
-      function ssh_proxy() {
-        tsocks ssh $*
-      }
+      source {{ user_home }}/.{{ user.name }}.env.profile
 
 - name: include {{ user_profile }} into {{ user_home }}/.bashrc
   become: yes
   become_user: "{{ user.name }}"
   blockinfile:
     path: "{{ user_home }}/.bashrc"
-    marker: "# {mark} ANSIBLE MANAGED BLOCK user_setup/{{ role_name }}/setup_shell"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK user_setup/{{ role_name }}/shell"
     block: |
       source {{ user_home }}/{{ user_profile }}
 
