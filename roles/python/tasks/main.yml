@@ -1,4 +1,36 @@
 ---
+- name: setup pip config directory
+  become: yes
+  become_user: "{{ user.name }}"
+  file:
+    path: "{{ user_home }}/.config/pip"
+    state: directory
+    owner: "{{ user.name }}"
+    group: "{{ user.name }}"
+    mode: "0755"
+
+- name: create pip profile {{ user_home }}/.config/pip/pip.conf
+  become: yes
+  become_user: "{{ user.name }}"
+  file:
+    path: "{{ user_home }}/.config/pip/pip.conf"
+    state: touch
+    owner: "{{ user.name }}"
+    group: "{{ user.name }}"
+    mode: "0644"
+    modification_time: preserve
+    access_time: preserve
+
+- name: setup pip profile for {{ user.name }}
+  become: yes
+  become_user: "{{ user.name }}"
+  blockinfile:
+    path: "{{ user_home }}/.config/pip/pip.conf"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK user_setup/{{ role_name }}/setup_pip_config"
+    block: |
+      [global]
+      index-url = https://pypi.tuna.tsinghua.edu.cn/simple
+
 - name: get miniconda3 installer under {{ user_home }}
   become: yes
   become_user: "{{ user.name }}"
