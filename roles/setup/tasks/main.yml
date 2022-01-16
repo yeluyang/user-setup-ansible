@@ -1,25 +1,11 @@
 ---
 
 - name: add user {{ user.name }}
+  become: yes
   user:
     name: "{{ user.name }}"
     password: "{{ user.pass | password_hash('sha512') }}"
     update_password: on_create
-
-- name: determine available groups
-  getent:
-    database: group
-
-- name: add user into group
-  user:
-    name: "{{ user.name }}"
-    groups: [ "{{ user_group }}" ]
-    append: yes
-  when: user_group in getent_group
-  loop:
-      - docker
-  loop_control:
-    loop_var: user_group
 
 - name: setup home directory for user {{ user.name }}
   become: yes
@@ -28,7 +14,7 @@
     path: "{{ user_home }}/{{ dir_name }}"
     state: directory
     owner: "{{ user.name }}"
-    group: "{{ user.name }}"
+    group: "{{ user.group }}"
     mode: "0755"
   loop_control:
     loop_var: dir_name
@@ -36,6 +22,7 @@
     - src
     - bin
     - pkg
+    - tmp
 
 - name: create user profile {{ user_home }}/{{ user_profile }}
   become: yes
@@ -44,57 +31,69 @@
     path: "{{ user_home }}/{{ user_profile }}"
     state: touch
     owner: "{{ user.name }}"
-    group: "{{ user.name }}"
+    group: "{{ user.group }}"
     mode: "0644"
     modification_time: preserve
     access_time: preserve
 
-- name: setup user env {{ user_home }}/.{{ user.name }}.env.profile
+- name: setup user env {{ user_home }}/.{{ user.name }}.preset.profile
   become: yes
   become_user: "{{ user.name }}"
   template:
     src: env.profile.j2
-    dest: "{{ user_home }}/.{{ user.name }}.env.profile"
+    dest: "{{ user_home }}/.{{ user.name }}.preset.profile"
     owner: "{{ user.name }}"
-    group: "{{ user.name }}"
+    group: "{{ user.group }}"
     mode: "0644"
 
-- name: include user env into {{ user_profile }}
+- name: include user preset into {{ user_profile }}
   become: yes
   become_user: "{{ user.name }}"
   blockinfile:
     path: "{{ user_home }}/{{ user_profile }}"
     marker: "# {mark} ANSIBLE MANAGED BLOCK user_setup/{{ role_name }}/env"
     block: |
-      source {{ user_home }}/.{{ user.name }}.env.profile
+      source {{ user_home }}/.{{ user.name }}.preset.profile
 
-- name: include {{ user_profile }} into {{ user_home }}/.bashrc
+- name: create shell profile {{ user_home }}/.profile
+  become: yes
+  become_user: "{{ user.name }}"
+  file:
+    path: "{{ user_home }}/.profile"
+    state: touch
+    owner: "{{ user.name }}"
+    group: "{{ user.group }}"
+    mode: "0644"
+    modification_time: preserve
+    access_time: preserve
+
+- name: include {{ user_profile }} into {{ user_home }}/.profile
   become: yes
   become_user: "{{ user.name }}"
   blockinfile:
-    path: "{{ user_home }}/.bashrc"
+    path: "{{ user_home }}/.profile"
     marker: "# {mark} ANSIBLE MANAGED BLOCK user_setup/{{ role_name }}/shell"
     block: |
       source {{ user_home }}/{{ user_profile }}
 
-- name: setup user ssh config directory
+- name: create user ssh config directory
   become: yes
   become_user: "{{ user.name }}"
   file:
     path: "{{ user_home }}/.ssh"
     state: directory
     owner: "{{ user.name }}"
-    group: "{{ user.name }}"
+    group: "{{ user.group }}"
     mode: "0755"
 
-- name: setup user ssh config file
+- name: create user ssh config file
   become: yes
   become_user: "{{ user.name }}"
   file:
     path: "{{ user_home }}/.ssh/config"
     state: touch
     owner: "{{ user.name }}"
-    group: "{{ user.name }}"
+    group: "{{ user.group }}"
     mode: "0644"
     modification_time: preserve
     access_time: preserve
@@ -108,3 +107,55 @@
     block: |
       Host *
         ServerAliveInterval 240
+
+- name: get homebrew installer for darwin
+  when: ansible_os_family == 'Darwin'
+  become: yes
+  become_user: "{{ user.name }}"
+  get_url:
+    url: https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
+    dest: "{{ user_home }}/.homebrew.installer.sh"
+    owner: "{{ user.name }}"
+    group: "{{ user.group }}"
+    mode: '0755'
+
+- name: set mirror for homebrew
+  when: ansible_os_family == 'Darwin'
+  become: yes
+  become_user: "{{ user.name }}"
+  blockinfile:
+    path: "{{ user_home }}/{{ user_profile }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK user_setup/{{ role_name }}/setup_brew"
+    block: |
+      export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git"
+      export HOMEBREW_CORE_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git"
+      export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles"
+
+- name: install homebrew on darwin
+  when: ansible_os_family == 'Darwin'
+  become: yes
+  shell:
+    cmd: "{{ user_home }}/.homebrew.installer.sh"
+    chdir: "{{ user_home }}"
+    creates: "/usr/local/Homebrew"
+
+- name: install base cli tools via brew
+  when: ansible_pkg_mgr == 'homebrew'
+  become: yes
+  become_user: "{{ user.name }}"
+  homebrew:
+    name:
+      - git
+      - git-lfs
+      - curl
+    state: present
+
+- name: install base cli tools
+  when: ansible_pkg_mgr != 'homebrew'
+  become: yes
+  package:
+    name:
+      - git
+      - git-lfs
+      - curl
+    state: present

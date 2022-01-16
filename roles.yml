@@ -1,56 +1,59 @@
 ---
+
 - name: setup user {{ user.name }} with home {{ user_home }}
+  tags: always
   include_role:
     name: setup
     apply:
       tags: always
-  tags: always
 
 - name: setup git for {{ user.name }}
+  tags: git
   include_role:
     name: git
     apply:
       tags:
         - git
         - always
-  tags:
-    - git
-    - always
 
 - name: setup vim for {{ user.name }}
+  tags:
+    - vim
+    - cli
   include_role:
     name: vim
     apply:
       tags:
         - vim
         - cli
-  tags:
-    - vim
-    - cli
 
 - name: setup zsh for {{ user.name }}
+  tags:
+    - zsh
+    - cli
   include_role:
     name: zsh
     apply:
       tags:
         - zsh
         - cli
-  tags:
-    - zsh
-    - cli
 
 - name: setup tmux for {{ user.name }}
+  tags:
+    - tmux
+    - cli
   include_role:
     name: tmux
     apply:
       tags:
         - tmux
         - cli
-  tags:
-    - tmux
-    - cli
 
 - name: setup rust for {{ user.name }}
+  tags:
+    - rust
+    - rs
+    - langs
   include_role:
     name: rust
     apply:
@@ -58,12 +61,12 @@
         - rust
         - rs
         - langs
-  tags:
-    - rust
-    - rs
-    - langs
 
 - name: setup golang for {{ user.name }}
+  tags:
+    - golang
+    - go
+    - langs
   include_role:
     name: golang
     apply:
@@ -71,12 +74,12 @@
         - golang
         - go
         - langs
-  tags:
-    - golang
-    - go
-    - langs
 
 - name: setup python for {{ user.name }}
+  tags:
+    - python
+    - py
+    - langs
   include_role:
     name: python
     apply:
@@ -84,18 +87,14 @@
         - python
         - py
         - langs
-  tags:
-    - python
-    - py
-    - langs
 
 - name: setup docker for {{ user.name }}
+  tags:
+    - docker
+    - dev-backend
   include_role:
     name: docker
     apply:
       tags:
         - docker
         - dev-backend
-  tags:
-    - docker
-    - dev-backend

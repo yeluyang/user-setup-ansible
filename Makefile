@@ -1,7 +1,7 @@
-.PHONY: all
-all:
-	-ansible-playbook main.yml -i inventory/remote.yml --check --skip-tags always
-	-ansible-playbook main.yml -c local -i inventory/local.yml --check --skip-tags always
+.PHONY: debug
+debug:
+	-ansible-playbook main.yml -i inventory/remote.yml -t debug --skip-tags always
+	-ansible-playbook main.yml -c local -i inventory/local.yml -t debug --skip-tags always
 
 .PHONY: basic_remote
 basic_remote:
@@ -9,7 +9,7 @@ basic_remote:
 
 .PHONY: basic_local
 basic_local:
-	ansible-playbook main.yml -c local -i inventory/local.yml --become -t cli --skip-tags pro
+	ansible-playbook main.yml -c local -i inventory/local.yml -t cli --skip-tags pro
 
 .PHONY: remote
 remote:
@@ -21,8 +21,8 @@ remote_%:
 
 .PHONY: local
 local:
-	ansible-playbook main.yml -c local -i inventory/local.yml --become
+	ansible-playbook main.yml -c local -i inventory/local.yml
 
 .PHONY: local_%
 local_%:
-	ansible-playbook main.yml -c local -i inventory/local.yml --become -t $*
+	ansible-playbook main.yml -c local -i inventory/local.yml -t $*

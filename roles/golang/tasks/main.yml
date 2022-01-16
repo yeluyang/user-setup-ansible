@@ -1,8 +1,19 @@
 ---
+
+- name: install requirements for gvm via brew
+  when: ansible_pkg_mgr == 'homebrew'
+  become: yes
+  become_user: "{{ user.name }}"
+  homebrew:
+    name:
+      - bison
+    state: present
+
 - name: install requirements for gvm
+  when: ansible_pkg_mgr != 'homebrew'
+  become: yes
   package:
     name:
-      - curl
       - bison
     state: present
 
@@ -11,16 +22,16 @@
   become_user: "{{ user.name }}"
   get_url:
     url: https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer
-    dest: "{{ user_home }}/.gvm-installer.sh"
+    dest: "{{ user_home }}/.gvm.installer.sh"
     owner: "{{ user.name }}"
-    group: "{{ user.name }}"
+    group: "{{ user.group }}"
     mode: "0755"
 
 - name: install gvm for {{ user.name }}
   become: yes
   become_user: "{{ user.name }}"
   shell:
-    cmd: "GVM_NO_UPDATE_PROFILE=YES {{ user_home }}/.gvm-installer.sh"
+    cmd: "GVM_NO_UPDATE_PROFILE=YES {{ user_home }}/.gvm.installer.sh"
     chdir: "{{ user_home }}"
     creates: "{{ user_home }}/.gvm"
 

@@ -1,6 +1,16 @@
 ---
 
+- name: install docker via brew cask
+  when: ansible_pkg_mgr == 'homebrew'
+  become: yes
+  become_user: "{{ user.name }}"
+  homebrew_cask:
+    name: docker
+    state: present
+
 - name: install {{ docker_pkg_name[ansible_distribution] }} for {{ ansible_distribution }}
+  when: ansible_pkg_mgr != 'homebrew'
+  become: yes
   vars:
     - docker_pkg_name:
         Debian: docker.io
@@ -10,7 +20,8 @@
     state: present
 
 - name: add user {{ user.name }} in docker group
+  when: ansible_os_family != 'Darwin'
   user:
     name: "{{ user.name }}"
     append: yes
-    groups: [docker]
+    groups: [ docker ]

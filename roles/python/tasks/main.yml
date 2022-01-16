@@ -6,7 +6,7 @@
     path: "{{ user_home }}/.config/pip"
     state: directory
     owner: "{{ user.name }}"
-    group: "{{ user.name }}"
+    group: "{{ user.group }}"
     mode: "0755"
 
 - name: create pip profile {{ user_home }}/.config/pip/pip.conf
@@ -16,7 +16,7 @@
     path: "{{ user_home }}/.config/pip/pip.conf"
     state: touch
     owner: "{{ user.name }}"
-    group: "{{ user.name }}"
+    group: "{{ user.group }}"
     mode: "0644"
     modification_time: preserve
     access_time: preserve
@@ -32,6 +32,7 @@
       index-url = https://pypi.tuna.tsinghua.edu.cn/simple
 
 - name: get miniconda3 installer under {{ user_home }}
+  tags: pro
   become: yes
   become_user: "{{ user.name }}"
   vars:
@@ -45,32 +46,35 @@
           RedHat: https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh
   get_url:
     url: "{{ conda_url[ansible_architecture][ansible_os_family] }}"
-    dest: "{{ user_home }}/.miniconda3-installer.sh"
+    dest: "{{ user_home }}/.miniconda3.installer.sh"
     owner: "{{ user.name }}"
-    group: "{{ user.name }}"
+    group: "{{ user.group }}"
     mode: "0755"
 
 - name: install miniconda3 for {{ user.name }}
+  tags: pro
   become: yes
   become_user: "{{ user.name }}"
   shell:
-    cmd: "{{ user_home }}/.miniconda3-installer.sh -b -p {{ user_home }}/.conda/3.x"
+    cmd: "{{ user_home }}/.miniconda3.installer.sh -b -p {{ user_home }}/.conda/3.x"
     chdir: "{{ user_home }}"
     creates: "{{ user_home }}/.conda/3.x"
 
 - name: create conda profile {{ user_home }}/.condarc
+  tags: pro
   become: yes
   become_user: "{{ user.name }}"
   file:
     path: "{{ user_home }}/.condarc"
     state: touch
     owner: "{{ user.name }}"
-    group: "{{ user.name }}"
+    group: "{{ user.group }}"
     mode: "0644"
     modification_time: preserve
     access_time: preserve
 
 - name: setup conda profile for {{ user.name }}
+  tags: pro
   become: yes
   become_user: "{{ user.name }}"
   blockinfile:
@@ -80,8 +84,8 @@
       auto_activate_base: false
       show_channel_urls: true
       channels:
-        - defaults
         - tuna
+        - defaults
       custom_multichannels:
         tuna:
           - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main

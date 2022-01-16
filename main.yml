@@ -3,13 +3,17 @@
   remote_user: root
   tasks:
     - name: check inventory
+      tags: debug
       debug:
         msg: "{{ hostvars }}"
-      check_mode: yes
     - include_tasks: roles.yml
       vars:
-        - user_home: /home/{{ user.name }}
-        - user_profile: ".{{ user.name }}.common.profile"
+        - home_dir:
+            Darwin: /Users
+            Debian: /home
+            RedHat: /home
+        - user_home: "{{ home_dir[ansible_os_family] }}/{{ user.name }}"
+        - user_profile: ".{{ user.name }}.custom.profile"
       loop: "{{ users }}"
       loop_control:
         loop_var: user

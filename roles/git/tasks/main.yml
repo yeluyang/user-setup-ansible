@@ -1,12 +1,5 @@
 ---
 
-- name: install git and git-lfs
-  package:
-    name:
-      - git
-      - git-lfs
-    state: present
-
 - name: setup git credential helper as store for {{ user.name }}
   become: yes
   become_user: "{{ user.name }}"

@@ -5,9 +5,9 @@
   become_user: "{{ user.name }}"
   get_url:
     url: https://sh.rustup.rs
-    dest: "{{ user_home }}/.rustup-installer.sh"
+    dest: "{{ user_home }}/.rustup.installer.sh"
     owner: "{{ user.name }}"
-    group: "{{ user.name }}"
+    group: "{{ user.group }}"
     mode: "0755"
 
 - name: setup rustup mirror for {{ user.name }}
@@ -24,7 +24,7 @@
   become: yes
   become_user: "{{ user.name }}"
   shell:
-    cmd: "{{ user_home }}/.rustup-installer.sh -y -q --no-modify-path"
+    cmd: "{{ user_home }}/.rustup.installer.sh -y -q --no-modify-path"
     chdir: "{{ user_home }}"
     creates: "{{ user_home }}/.cargo"
 
@@ -35,7 +35,7 @@
     path: "{{ user_home }}/.cargo/config"
     state: touch
     owner: "{{ user.name }}"
-    group: "{{ user.name }}"
+    group: "{{ user.group }}"
     mode: "0644"
     modification_time: preserve
     access_time: preserve
@@ -47,12 +47,12 @@
     path: "{{ user_home }}/.cargo/config"
     marker: "# {mark} ANSIBLE MANAGED BLOCK user_setup/{{ role_name }}/setup_cargo_mirror"
     block: |
-      [source.crates-io]
-      replace-with = 'ustc'
       [source.tuna]
       registry = "https://mirrors.tuna.tsinghua.edu.cn/git/crates.io-index.git"
       [source.ustc]
       registry = "git://mirrors.ustc.edu.cn/crates.io-index"
+      [source.crates-io]
+      replace-with = 'tuna'
 
 - name: setup rust env for {{ user.name }}
   become: yes

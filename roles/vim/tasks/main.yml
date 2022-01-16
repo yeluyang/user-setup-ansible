@@ -1,15 +1,18 @@
 ---
 
-- name: install vim
-  package:
+- name: install vim via brew
+  when: ansible_pkg_mgr == 'homebrew'
+  become: yes
+  become_user: "{{ user.name }}"
+  homebrew:
     name: vim
     state: present
 
-- name: install dependencies of vim config
+- name: install vim
+  when: ansible_pkg_mgr != 'homebrew'
+  become: yes
   package:
-    name:
-      - curl
-      - git
+    name: vim
     state: present
 
 - name: setup vim env for {{ user.name }}
@@ -21,28 +24,22 @@
     block: |
       export EDITOR=vim
 
-- name: install requirements of vim config
-  package:
-    name: git
-    state: present
-  tags: pro
-
 - name: get vim config installer in {{ user_home }}
+  tags: pro
   become: yes
   become_user: "{{ user.name }}"
   get_url:
     url: https://spacevim.org/install.sh
-    dest: "{{ user_home }}/.space-vim-installer.sh"
+    dest: "{{ user_home }}/.space-vim.installer.sh"
     owner: "{{ user.name }}"
-    group: "{{ user.name }}"
+    group: "{{ user.group }}"
     mode: '0755'
-  tags: pro
 
 - name: setup vim config for {{ user.name }}
+  tags: pro
   become: yes
   become_user: "{{ user.name }}"
   shell:
-    cmd: "{{ user_home }}/.space-vim-installer.sh"
+    cmd: "{{ user_home }}/.space-vim.installer.sh"
     chdir: "{{ user_home }}"
     creates: "{{ user_home }}/.SpaceVim"
-  tags: pro
