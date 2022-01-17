@@ -21,6 +21,7 @@
 
 - name: add user {{ user.name }} in docker group
   when: ansible_os_family != 'Darwin'
+  become: yes
   user:
     name: "{{ user.name }}"
     append: yes
