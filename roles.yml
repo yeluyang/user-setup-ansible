@@ -16,16 +16,16 @@
         - git
         - always
 
-- name: setup vim for {{ user.name }}
+- name: setup docker for {{ user.name }}
   tags:
-    - vim
-    - cli
+    - docker
+    - dev-backend
   include_role:
-    name: vim
+    name: docker
     apply:
       tags:
-        - vim
-        - cli
+        - docker
+        - dev-backend
 
 - name: setup zsh for {{ user.name }}
   tags:
@@ -36,6 +36,17 @@
     apply:
       tags:
         - zsh
+        - cli
+
+- name: setup vim for {{ user.name }}
+  tags:
+    - vim
+    - cli
+  include_role:
+    name: vim
+    apply:
+      tags:
+        - vim
         - cli
 
 - name: setup tmux for {{ user.name }}
@@ -87,14 +98,3 @@
         - python
         - py
         - langs
-
-- name: setup docker for {{ user.name }}
-  tags:
-    - docker
-    - dev-backend
-  include_role:
-    name: docker
-    apply:
-      tags:
-        - docker
-        - dev-backend
