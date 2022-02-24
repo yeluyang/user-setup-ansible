@@ -1,5 +1,4 @@
 ---
-
 - name: install vim via brew
   when: ansible_pkg_mgr == 'homebrew'
   become: yes
@@ -33,13 +32,21 @@
     dest: "{{ user_home }}/.space-vim.installer.sh"
     owner: "{{ user.name }}"
     group: "{{ user.group }}"
-    mode: '0755'
+    mode: "0755"
+
+- name: check requirements of SpaceVim
+  tags: pro
+  become: yes
+  become_user: "{{ user.name }}"
+  shell:
+    cmd: "{{ user_home }}/.space-vim.installer.sh --checkRequirements"
+    chdir: "{{ user_home }}"
 
 - name: setup vim config for {{ user.name }}
   tags: pro
   become: yes
   become_user: "{{ user.name }}"
   shell:
-    cmd: "{{ user_home }}/.space-vim.installer.sh"
+    cmd: "{{ user_home }}/.space-vim.installer.sh --no-fonts"
     chdir: "{{ user_home }}"
     creates: "{{ user_home }}/.SpaceVim"
