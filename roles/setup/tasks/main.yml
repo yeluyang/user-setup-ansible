@@ -5,6 +5,7 @@
     name: "{{ user.name }}"
     password: "{{ user.pass | password_hash('sha512') }}"
     update_password: on_create
+    generate_ssh_key: yes
 
 - name: setup home directory for user {{ user.name }}
   become: true

@@ -41,4 +41,10 @@
     name: lfs.url
     scope: global
     value: "{{ user.git.lfs }}"
-  when: user.git.lfs is defined
+
+- name: setup github ssh key named {{ user.name }}@{{ ansible_nodename}}
+  when: user.git.tokens.github is defined
+  github_key:
+    name: "{{ user.name }}@{{ ansible_nodename}}"
+    token: "{{ user.git.tokens.github }}"
+    pubkey: "{{ lookup('file', '{{ user_home }}/.ssh/id_rsa.pub') }}"
