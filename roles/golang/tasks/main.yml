@@ -1,8 +1,7 @@
 ---
-
 - name: install requirements for gvm via brew
   when: ansible_pkg_mgr == 'homebrew'
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   homebrew:
     name:
@@ -11,14 +10,14 @@
 
 - name: install requirements for gvm
   when: ansible_pkg_mgr != 'homebrew'
-  become: yes
+  become: true
   package:
     name:
       - bison
     state: present
 
 - name: get gvm installer under {{ user_home }}
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   get_url:
     url: https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer
@@ -28,7 +27,7 @@
     mode: "0755"
 
 - name: install gvm for {{ user.name }}
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   shell:
     cmd: "GVM_NO_UPDATE_PROFILE=YES {{ user_home }}/.gvm.installer.sh"
@@ -36,7 +35,7 @@
     creates: "{{ user_home }}/.gvm"
 
 - name: setup go env for {{ user.name }}
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   blockinfile:
     path: "{{ user_home }}/{{ user_profile }}"
@@ -50,14 +49,14 @@
   loop: "{{ user.golang.version }}"
   loop_control:
     loop_var: version
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   gvm_install:
     version: "{{ version }}"
 
 - name: set {{ user.golang.default }} as default golang version for {{ user.name }} via gvm
   when: user.golang is defined and user.golang.default is defined
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   gvm_use:
     version: "{{ user.golang.default }}"

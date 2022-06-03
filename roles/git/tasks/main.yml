@@ -1,7 +1,6 @@
 ---
-
 - name: setup git credential helper as store for {{ user.name }}
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   git_config:
     name: credential.helper
@@ -9,7 +8,7 @@
     value: store
 
 - name: setup git push default as simple for {{ user.name }}
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   git_config:
     name: push.default
@@ -17,28 +16,35 @@
     value: simple
 
 - name: setup git author name for {{ user.name }}
-  become: yes
+  when: user.git.author is defined
+  become: true
   become_user: "{{ user.name }}"
   git_config:
     name: user.name
     scope: global
     value: "{{ user.git.author }}"
-  when: user.git.author is defined
 
 - name: setup git author email for {{ user.name }}
-  become: yes
+  when: user.git.email is defined
+  become: true
   become_user: "{{ user.name }}"
   git_config:
     name: user.email
     scope: global
     value: "{{ user.git.email }}"
-  when: user.git.email is defined
 
 - name: setup git lfs.url for {{ user.name }}
-  become: yes
+  when: user.git.lfs is defined
+  become: true
   become_user: "{{ user.name }}"
   git_config:
     name: lfs.url
     scope: global
     value: "{{ user.git.lfs }}"
-  when: user.git.lfs is defined
+
+- name: setup github ssh key named {{ user.name }}@{{ ansible_nodename}}
+  when: user.git.tokens.github is defined
+  github_key:
+    name: "{{ user.name }}@{{ ansible_nodename}}"
+    token: "{{ user.git.tokens.github }}"
+    pubkey: "{{ lookup('file', '{{ user_home }}/.ssh/id_rsa.pub') }}"

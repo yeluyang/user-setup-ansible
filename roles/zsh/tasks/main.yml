@@ -1,7 +1,6 @@
 ---
-
 - name: install zsh via brew
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   when: ansible_pkg_mgr == 'homebrew'
   homebrew:
@@ -9,7 +8,7 @@
     state: present
 
 - name: install zsh
-  become: yes
+  become: true
   when: ansible_pkg_mgr != 'homebrew'
   package:
     name: zsh
@@ -17,18 +16,18 @@
 
 - name: get zsh config installer in {{ user_home }}
   tags: pro
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   get_url:
     url: https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh
     dest: "{{ user_home }}/.oh-my-zsh.installer.sh"
     owner: "{{ user.name }}"
     group: "{{ user.group }}"
-    mode: '0755'
+    mode: "0755"
 
 - name: setup zsh config for {{ user.name }}
   tags: pro
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   shell:
     cmd: "{{ user_home }}/.oh-my-zsh.installer.sh --unattended"
@@ -37,7 +36,7 @@
 
 - name: include {{ user_profile }} into {{ user_home }}/.zshrc
   tags: pro
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   blockinfile:
     path: "{{ user_home }}/.zshrc"
@@ -47,14 +46,14 @@
 
 - name: setup {{ user.name }}'s login shell when use brew
   when: ansible_pkg_mgr == 'homebrew'
-  become: yes
+  become: true
   user:
     name: "{{ user.name }}"
     shell: /usr/local/bin/zsh
 
 - name: setup {{ user.name }}'s login shell
   when: ansible_pkg_mgr != 'homebrew'
-  become: yes
+  become: true
   user:
     name: "{{ user.name }}"
     shell: /bin/zsh
