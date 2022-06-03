@@ -36,24 +36,24 @@
     modification_time: preserve
     access_time: preserve
 
-- name: setup user env {{ user_home }}/.{{ user.name }}.preset.profile
+- name: setup user env {{ user_home }}/.{{ user.name }}.static.profile
   become: true
   become_user: "{{ user.name }}"
   template:
-    src: env.profile.j2
-    dest: "{{ user_home }}/.{{ user.name }}.preset.profile"
+    src: static.profile.j2
+    dest: "{{ user_home }}/.{{ user.name }}.static.profile"
     owner: "{{ user.name }}"
     group: "{{ user.group }}"
     mode: "0644"
 
-- name: include user preset into {{ user_profile }}
+- name: include user static profile into {{ user_profile }}
   become: true
   become_user: "{{ user.name }}"
   blockinfile:
     path: "{{ user_home }}/{{ user_profile }}"
     marker: "# {mark} ANSIBLE MANAGED BLOCK user_setup/{{ role_name }}/env"
     block: |
-      source {{ user_home }}/.{{ user.name }}.preset.profile
+      source {{ user_home }}/.{{ user.name }}.static.profile
 
 - name: create shell profile {{ user_home }}/.profile
   become: true
