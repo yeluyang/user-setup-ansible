@@ -1,8 +1,7 @@
 ---
-
 - name: install tmux via brew
   when: ansible_pkg_mgr == 'homebrew'
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   homebrew:
     name: tmux
@@ -11,7 +10,7 @@
 - name: install requirements for tmux config via brew
   tags: pro
   when: ansible_pkg_mgr == 'homebrew'
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   homebrew:
     name:
@@ -23,7 +22,7 @@
 
 - name: install tmux
   when: ansible_pkg_mgr != 'homebrew'
-  become: yes
+  become: true
   package:
     name: tmux
     state: present
@@ -31,7 +30,7 @@
 - name: install requirements for tmux config
   tags: pro
   when: ansible_pkg_mgr != 'homebrew'
-  become: yes
+  become: true
   package:
     name:
       - perl
@@ -42,16 +41,16 @@
 
 - name: pull tmux config in {{ user.name }}
   tags: pro
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   git:
-    repo: 'https://github.com/gpakosz/.tmux.git'
+    repo: "https://github.com/gpakosz/.tmux.git"
     dest: "{{ user_home }}/.tmux"
     update: no
 
 - name: setup tmux config for {{ user.name }}
   tags: pro
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   file:
     state: link
@@ -62,7 +61,7 @@
 
 - name: prepare for tmux config custom by {{ user.name }}
   tags: pro
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   copy:
     remote_src: yes
@@ -75,7 +74,7 @@
 
 - name: custom tmux config for {{ user.name }}
   tags: pro
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   blockinfile:
     path: "{{ user_home }}/.tmux.conf.local"

@@ -1,7 +1,6 @@
 ---
-
 - name: get rust installer under {{ user_home }}
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   get_url:
     url: https://sh.rustup.rs
@@ -11,7 +10,7 @@
     mode: "0755"
 
 - name: setup rustup mirror for {{ user.name }}
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   blockinfile:
     path: "{{ user_home }}/{{ user_profile }}"
@@ -21,7 +20,7 @@
       export RUSTUP_UPDATE_ROOT=https://mirrors.ustc.edu.cn/rust-static/rustup
 
 - name: install rust for {{ user.name }}
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   shell:
     cmd: "{{ user_home }}/.rustup.installer.sh -y -q --no-modify-path"
@@ -29,7 +28,7 @@
     creates: "{{ user_home }}/.cargo"
 
 - name: setup cargo config file {{ user_home }}/.cargo/config
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   file:
     path: "{{ user_home }}/.cargo/config"
@@ -41,7 +40,7 @@
     access_time: preserve
 
 - name: setup cargo mirror for {{ user.name }}
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   blockinfile:
     path: "{{ user_home }}/.cargo/config"
@@ -55,7 +54,7 @@
       replace-with = 'tuna'
 
 - name: setup rust env for {{ user.name }}
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   blockinfile:
     path: "{{ user_home }}/{{ user_profile }}"

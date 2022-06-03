@@ -7,14 +7,14 @@
       debug:
         msg: "{{ hostvars }}"
     - include_tasks: roles.yml
-      vars:
-        - home_dir:
-            Darwin: /Users
-            Debian: /home
-            RedHat: /home
-        - user_home: "{{ home_dir[ansible_os_family] }}/{{ user.name }}"
-        - user_profile: ".{{ user.name }}.custom.profile"
+      tags: always
       loop: "{{ users }}"
       loop_control:
         loop_var: user
-      tags: always
+      vars:
+        home_dir:
+          Darwin: /Users
+          Debian: /home
+          RedHat: /home
+        user_home: "{{ home_dir[ansible_os_family] }}/{{ user.name }}"
+        user_profile: ".{{ user.name }}.custom.profile"

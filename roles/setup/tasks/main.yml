@@ -1,14 +1,13 @@
 ---
-
 - name: add user {{ user.name }}
-  become: yes
+  become: true
   user:
     name: "{{ user.name }}"
     password: "{{ user.pass | password_hash('sha512') }}"
     update_password: on_create
 
 - name: setup home directory for user {{ user.name }}
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   file:
     path: "{{ user_home }}/{{ dir_name }}"
@@ -25,7 +24,7 @@
     - tmp
 
 - name: create user profile {{ user_home }}/{{ user_profile }}
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   file:
     path: "{{ user_home }}/{{ user_profile }}"
@@ -37,7 +36,7 @@
     access_time: preserve
 
 - name: setup user env {{ user_home }}/.{{ user.name }}.preset.profile
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   template:
     src: env.profile.j2
@@ -47,7 +46,7 @@
     mode: "0644"
 
 - name: include user preset into {{ user_profile }}
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   blockinfile:
     path: "{{ user_home }}/{{ user_profile }}"
@@ -56,7 +55,7 @@
       source {{ user_home }}/.{{ user.name }}.preset.profile
 
 - name: create shell profile {{ user_home }}/.profile
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   file:
     path: "{{ user_home }}/.profile"
@@ -68,7 +67,7 @@
     access_time: preserve
 
 - name: include {{ user_profile }} into {{ user_home }}/.profile
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   blockinfile:
     path: "{{ user_home }}/.profile"
@@ -77,7 +76,7 @@
       source {{ user_home }}/{{ user_profile }}
 
 - name: create user ssh config directory
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   file:
     path: "{{ user_home }}/.ssh"
@@ -87,7 +86,7 @@
     mode: "0755"
 
 - name: create user ssh config file
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   file:
     path: "{{ user_home }}/.ssh/config"
@@ -99,7 +98,7 @@
     access_time: preserve
 
 - name: setup {{ user_home }}/.ssh/config
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   blockinfile:
     path: "{{ user_home }}/.ssh/config"
@@ -110,18 +109,18 @@
 
 - name: get homebrew installer for darwin
   when: ansible_os_family == 'Darwin'
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   get_url:
     url: https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
     dest: "{{ user_home }}/.homebrew.installer.sh"
     owner: "{{ user.name }}"
     group: "{{ user.group }}"
-    mode: '0755'
+    mode: "0755"
 
 - name: set mirror for homebrew
   when: ansible_os_family == 'Darwin'
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   blockinfile:
     path: "{{ user_home }}/{{ user_profile }}"
@@ -133,7 +132,7 @@
 
 - name: install homebrew on darwin
   when: ansible_os_family == 'Darwin'
-  become: yes
+  become: true
   shell:
     cmd: "{{ user_home }}/.homebrew.installer.sh"
     chdir: "{{ user_home }}"
@@ -141,7 +140,7 @@
 
 - name: install base cli tools via brew
   when: ansible_pkg_mgr == 'homebrew'
-  become: yes
+  become: true
   become_user: "{{ user.name }}"
   homebrew:
     name:
@@ -152,7 +151,7 @@
 
 - name: install base cli tools
   when: ansible_pkg_mgr != 'homebrew'
-  become: yes
+  become: true
   package:
     name:
       - git
