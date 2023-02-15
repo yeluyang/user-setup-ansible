@@ -1,0 +1,28 @@
+---
+- name: install nvm via brew
+  when: ansible_pkg_mgr == 'homebrew'
+  become: true
+  become_user: "{{ user.name }}"
+  homebrew:
+    name: nvm
+    state: present
+
+- name: get nvm installer in {{ user_home }}
+  when: ansible_pkg_mgr != 'homebrew'
+  become: true
+  become_user: "{{ user.name }}"
+  get_url:
+    url: https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh
+    dest: "{{ user_home }}/.nvm.installer.sh"
+    owner: "{{ user.name }}"
+    group: "{{ user.group }}"
+    mode: "0755"
+
+- name: install nvm for {{ user.name }}
+  when: ansible_pkg_mgr != 'homebrew'
+  become: true
+  become_user: "{{ user.name }}"
+  shell:
+    cmd: "{{ user_home }}/.nvm.installer.sh"
+    chdir: "{{ user_home }}"
+    creates: "{{ user_home }}/.nvm"
