@@ -4,14 +4,18 @@
   become: true
   become_user: "{{ user.name }}"
   homebrew:
-    name: vim
+    name:
+      - vim
+      - neovim
     state: present
 
 - name: install vim
   when: ansible_pkg_mgr != 'homebrew'
   become: true
   package:
-    name: vim
+    name:
+      - vim
+      - neovim
     state: present
 
 - name: setup vim env for {{ user.name }}
@@ -21,7 +25,7 @@
     path: "{{ user_home }}/{{ user_profile }}"
     marker: "# {mark} ANSIBLE MANAGED BLOCK user_setup/{{ role_name }}"
     block: |
-      export EDITOR=vim
+      export EDITOR=nvim
 
 - name: get vim config installer in {{ user_home }}
   tags: pro
