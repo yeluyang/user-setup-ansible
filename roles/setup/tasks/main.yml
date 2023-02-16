@@ -6,6 +6,7 @@
     password: "{{ user.pass | password_hash('sha512') }}"
     update_password: on_create
     generate_ssh_key: yes
+    ssh_key_comment: "{{ user.name }}@{{ ansible_nodename}}"
 
 - name: setup home directory for user {{ user.name }}
   become: true

@@ -98,3 +98,18 @@
         - python
         - py
         - langs
+
+- name: setup node.js for {{ user.name }}
+  tags:
+    - nodejs
+    - node
+    - js
+    - langs
+  include_role:
+    name: nodejs
+    apply:
+      tags:
+        - nodejs
+        - node
+        - js
+        - langs
