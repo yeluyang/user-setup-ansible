@@ -3,3 +3,4 @@ tmp/
 *.retry
 .vscode/
 .idea/
+.DS_Store
