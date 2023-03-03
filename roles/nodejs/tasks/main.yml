@@ -7,6 +7,17 @@
     name: nvm
     state: present
 
+- name: set nvm shell config
+  when: ansible_pkg_mgr == 'homebrew'
+  become: true
+  become_user: "{{ user.name }}"
+  blockinfile:
+    path: "{{ user_home }}/{{ user_profile }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK user_setup/{{ role_name }}/setup_nvm"
+    block: |
+      [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
+      [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+
 - name: get nvm installer in {{ user_home }}
   when: ansible_pkg_mgr != 'homebrew'
   become: true

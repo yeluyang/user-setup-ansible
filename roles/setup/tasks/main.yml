@@ -77,6 +77,27 @@
     block: |
       source {{ user_home }}/{{ user_profile }}
 
+- name: create shell profile {{ user_home }}/.zprofile
+  become: true
+  become_user: "{{ user.name }}"
+  file:
+    path: "{{ user_home }}/.zprofile"
+    state: touch
+    owner: "{{ user.name }}"
+    group: "{{ user.group }}"
+    mode: "0644"
+    modification_time: preserve
+    access_time: preserve
+
+- name: include {{ user_profile }} into {{ user_home }}/.zprofile
+  become: true
+  become_user: "{{ user.name }}"
+  blockinfile:
+    path: "{{ user_home }}/.zprofile"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK user_setup/{{ role_name }}/shell"
+    block: |
+      source {{ user_home }}/{{ user_profile }}
+
 - name: create user ssh config directory
   become: true
   become_user: "{{ user.name }}"
@@ -120,27 +141,24 @@
     group: "{{ user.group }}"
     mode: "0755"
 
-- name: set mirror for homebrew
+- name: install homebrew on darwin
+  when: ansible_os_family == 'Darwin'
+  become: true
+  become_user: "{{ user.name }}"
+  shell:
+    cmd: "NONINTERACTIVE=YES {{ user_home }}/.homebrew.installer.sh"
+    chdir: "{{ user_home }}"
+    creates: "/opt/homebrew/bin/brew"
+
+- name: set homebrew shell env
   when: ansible_os_family == 'Darwin'
   become: true
   become_user: "{{ user.name }}"
   blockinfile:
     path: "{{ user_home }}/{{ user_profile }}"
-    marker: "# {mark} ANSIBLE MANAGED BLOCK user_setup/{{ role_name }}/setup_brew"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK user_setup/{{ role_name }}/setup_brew_env"
     block: |
-      export HOMEBREW_INSTALL_FROM_API=1
-      export HOMEBREW_API_DOMAIN="https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles/api"
-      export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git"
-      export HOMEBREW_CORE_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git"
-      export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles"
-
-- name: install homebrew on darwin
-  when: ansible_os_family == 'Darwin'
-  become: true
-  shell:
-    cmd: "{{ user_home }}/.homebrew.installer.sh"
-    chdir: "{{ user_home }}"
-    creates: "/usr/local/Homebrew"
+      eval "$(/opt/homebrew/bin/brew shellenv)"
 
 - name: install base cli tools via brew
   when: ansible_pkg_mgr == 'homebrew'
@@ -152,6 +170,24 @@
       - git-lfs
       - curl
     state: present
+
+- name: install iterm2 via brew cask
+  when: ansible_pkg_mgr == 'homebrew'
+  become: true
+  become_user: "{{ user.name }}"
+  homebrew_cask:
+    name: iterm2
+    state: present
+
+- name: set curl shell config
+  when: ansible_pkg_mgr == 'homebrew'
+  become: true
+  become_user: "{{ user.name }}"
+  blockinfile:
+    path: "{{ user_home }}/{{ user_profile }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK user_setup/{{ role_name }}/setup_curl"
+    block: |
+      export PATH="/opt/homebrew/opt/curl/bin:$PATH"
 
 - name: install base cli tools
   when: ansible_pkg_mgr != 'homebrew'

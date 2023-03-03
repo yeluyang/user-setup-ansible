@@ -1,12 +1,25 @@
 export PATH=${HOME}/bin:${PATH}
 
+# homebrew
+export HOMEBREW_INSTALL_FROM_API=1
+export HOMEBREW_API_DOMAIN="https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles/api"
+export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git"
+export HOMEBREW_CORE_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git"
+export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles"
+
+# rust
+export RUSTUP_DIST_SERVER=https://mirrors.ustc.edu.cn/rust-static
+export RUSTUP_UPDATE_ROOT=https://mirrors.ustc.edu.cn/rust-static/rustup
+
+# golang
+export GOPATH="${HOME}" && export GOPROXY="https://goproxy.io" && export GO111MODULE="auto"
+
+# node.js
+export NVM_DIR="$HOME/.nvm"ustup
+
+export PROXY_SOCKS_ENDPOINT=127.0.0.1:1086
+export PROXY_HTTP_ENDPOINT=127.0.0.1:1080
 function proxy() {
-	# setup your proxy endpoint manually in this file, like:
-	#
-	#   export PROXY_SOCKS_ENDPOINT=127.0.0.1:1080
-	#   export PROXY_HTTP_ENDPOINT=127.0.0.1:1081
-	#
-	# after setup these var, call `proxy` in terminal can start proxy
 	export all_proxy=socks5://${PROXY_SOCKS_ENDPOINT};
 	export ALL_PROXY=socks5://${PROXY_SOCKS_ENDPOINT};
 	export http_proxy=http://${PROXY_HTTP_ENDPOINT};
@@ -14,7 +27,6 @@ function proxy() {
 	export https_proxy=http://${PROXY_HTTP_ENDPOINT};
 	export HTTPS_PROXY=http://${PROXY_HTTP_ENDPOINT};
 }
-
 function unproxy() {
 	unset all_proxy;
 	unset ALL_PROXY;
@@ -23,7 +35,6 @@ function unproxy() {
 	unset https_proxy;
 	unset HTTPS_PROXY;
 }
-
 function ssh_proxy() {
   tsocks ssh $*
 }

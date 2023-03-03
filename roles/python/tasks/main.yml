@@ -44,6 +44,8 @@
       aarch64:
         Debian: https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh
         RedHat: https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh
+      arm64:
+        Darwin: https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-arm64.sh
   get_url:
     url: "{{ conda_url[ansible_architecture][ansible_os_family] }}"
     dest: "{{ user_home }}/.miniconda3.installer.sh"

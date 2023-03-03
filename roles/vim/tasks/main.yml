@@ -18,21 +18,12 @@
       - neovim
     state: present
 
-- name: setup vim env for {{ user.name }}
-  become: true
-  become_user: "{{ user.name }}"
-  blockinfile:
-    path: "{{ user_home }}/{{ user_profile }}"
-    marker: "# {mark} ANSIBLE MANAGED BLOCK user_setup/{{ role_name }}"
-    block: |
-      export EDITOR=nvim
-
 - name: get vim config installer in {{ user_home }}
   tags: pro
   become: true
   become_user: "{{ user.name }}"
   get_url:
-    url: https://spacevim.org/install.sh
+    url: https://spacevim.org/cn/install.sh
     dest: "{{ user_home }}/.space-vim.installer.sh"
     owner: "{{ user.name }}"
     group: "{{ user.group }}"
@@ -52,6 +43,6 @@
   become: true
   become_user: "{{ user.name }}"
   shell:
-    cmd: "{{ user_home }}/.space-vim.installer.sh --no-fonts"
+    cmd: "{{ user_home }}/.space-vim.installer.sh"
     chdir: "{{ user_home }}"
     creates: "{{ user_home }}/.SpaceVim"
