@@ -8,6 +8,16 @@
       - bison
     state: present
 
+- name: set bison shell config
+  when: ansible_pkg_mgr == 'homebrew'
+  become: true
+  become_user: "{{ user.name }}"
+  blockinfile:
+    path: "{{ user_home }}/{{ user_profile }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK user_setup/{{ role_name }}/setup_bison"
+    block: |
+      export PATH="/opt/homebrew/opt/bison/bin:$PATH"
+
 - name: install requirements for gvm
   when: ansible_pkg_mgr != 'homebrew'
   become: true
@@ -42,7 +52,6 @@
     marker: "# {mark} ANSIBLE MANAGED BLOCK user_setup/{{ role_name }}"
     block: |
       [[ -s "${HOME}/.gvm/scripts/gvm" ]] && source "${HOME}/.gvm/scripts/gvm"
-      export GOPATH="${HOME}" && export GOPROXY="https://goproxy.io" && export GO111MODULE="auto"
 
 - name: install golang for {{ user.name }} via gvm
   when: user.golang is defined and user.golang.version is defined

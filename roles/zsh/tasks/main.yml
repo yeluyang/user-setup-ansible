@@ -34,22 +34,12 @@
     chdir: "{{ user_home }}"
     creates: "{{ user_home }}/.oh-my-zsh"
 
-- name: include {{ user_profile }} into {{ user_home }}/.zshrc
-  tags: pro
-  become: true
-  become_user: "{{ user.name }}"
-  blockinfile:
-    path: "{{ user_home }}/.zshrc"
-    marker: "# {mark} ANSIBLE MANAGED BLOCK user_setup/{{ role_name }}"
-    block: |
-      source {{ user_home }}/{{ user_profile }}
-
 - name: setup {{ user.name }}'s login shell when use brew
   when: ansible_pkg_mgr == 'homebrew'
   become: true
   user:
     name: "{{ user.name }}"
-    shell: /usr/local/bin/zsh
+    shell: /opt/homebrew/bin/zsh
 
 - name: setup {{ user.name }}'s login shell
   when: ansible_pkg_mgr != 'homebrew'

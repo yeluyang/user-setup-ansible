@@ -9,16 +9,6 @@
     group: "{{ user.group }}"
     mode: "0755"
 
-- name: setup rustup mirror for {{ user.name }}
-  become: true
-  become_user: "{{ user.name }}"
-  blockinfile:
-    path: "{{ user_home }}/{{ user_profile }}"
-    marker: "# {mark} ANSIBLE MANAGED BLOCK user_setup/{{ role_name }}/setup_rustup_mirror"
-    block: |
-      export RUSTUP_DIST_SERVER=https://mirrors.ustc.edu.cn/rust-static
-      export RUSTUP_UPDATE_ROOT=https://mirrors.ustc.edu.cn/rust-static/rustup
-
 - name: install rust for {{ user.name }}
   become: true
   become_user: "{{ user.name }}"
