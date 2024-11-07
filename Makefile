@@ -1,9 +1,12 @@
 PLAYBOOK := ansible-playbook main.yml
 
-.PHONY: debug
-debug:
-	-$(PLAYBOOK) -i inventory/remote.yml -t debug --skip-tags always
-	-$(PLAYBOOK) -c local -i inventory/local.yml -t debug --skip-tags always
+.PHONY: debug_remote
+debug_remote:
+	-$(PLAYBOOK) -i inventory/remote.yml -t debug --skip-tags main
+
+.PHONY: debug_local
+debug_local:
+	-$(PLAYBOOK) -c local -i inventory/local.yml -t debug --skip-tags main
 
 .PHONY: basic_remote
 basic_remote:

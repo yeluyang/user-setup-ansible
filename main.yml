@@ -1,20 +1,63 @@
 ---
-- hosts: nodes
+- name: Setup user
+  hosts: nodes
   remote_user: root
+  vars:
+    user_profile: ".{{ user.name }}.personal.profile"
+  environment:
+    HOMEBREW_INSTALL_FROM_API: "1"
+    HOMEBREW_API_DOMAIN: "https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles/api"
+    HOMEBREW_BREW_GIT_REMOTE: "https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git"
+    HOMEBREW_CORE_GIT_REMOTE: "https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git"
+    HOMEBREW_BOTTLE_DOMAIN: "https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles"
+    HOMEBREW_PIP_INDEX_URL: "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
   tasks:
-    - name: check inventory
-      tags: debug
-      debug:
-        msg: "{{ hostvars }}"
-    - include_tasks: roles.yml
+    - name: Create user
       tags: always
-      loop: "{{ users }}"
+      become: true
+      register: user_fact
+      ansible.builtin.user:
+        name: "{{ user.name }}"
+        password: "{{ user.pass | password_hash('sha512') }}"
+        update_password: on_create
+        create_home: true
+
+    - name: Check vars
+      tags: always
+      ansible.builtin.debug:
+        msg: "{{ hostvars }}"
+
+    - name: Create home directories
+      become: true
+      become_user: "{{ user.name }}"
+      ansible.builtin.file:
+        path: "{{ user_fact.home }}/{{ dir_name }}"
+        state: directory
+        owner: "{{ user.name }}"
+        group: "{{ user_fact.group }}"
+        mode: "0755"
       loop_control:
-        loop_var: user
-      vars:
-        home_dir:
-          Darwin: /Users
-          Debian: /home
-          RedHat: /home
-        user_home: "{{ home_dir[ansible_os_family] }}/{{ user.name }}"
-        user_profile: ".{{ user.name }}.custom.profile"
+        loop_var: dir_name
+      loop:
+        - src
+        - bin
+        - pkg
+        - tmp
+
+    - name: Generate ssh key
+      become: true
+      become_user: "{{ user.name }}"
+      register: ssh_key
+      ansible.builtin.user:
+        name: "{{ user.name }}"
+        generate_ssh_key: true
+        ssh_key_type: rsa
+        ssh_key_file: .ssh/id_rsa
+        ssh_key_comment: "{{ user.name }}@{{ ansible_nodename }}"
+
+    - name: Upload ssh key to github
+      when: user.git.tokens.github is defined
+      community.general.github_key:
+        name: "{{ user.name }}@{{ ansible_nodename }}"
+        token: "{{ user.git.tokens.github }}"
+        pubkey: "{{ ssh_key.ssh_public_key }}"

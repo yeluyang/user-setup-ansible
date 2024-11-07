@@ -2,7 +2,13 @@ all:
   children:
     nodes:
       hosts:
-        node-0.0.0.0:
-          ansible_host: 0.0.0.0
-          ansible_ssh_user: 'root'
-          ansible_ssh_pass: 'root_secret'
+        node-remote:
+          ansible_host: fdbd:dc01:ff:30a:72d9:22a0:cff9:dd46 # ipv4 or ipv6
+          ansible_ssh_user: "yeluyang" # privilege user
+          # login via password
+          # ansible_ssh_pass: "root_secret"
+          # login via other ways
+          ansible_ssh_common_args: >
+            -o GSSAPIAuthentication=yes
+            -o PubkeyAuthentication=no
+            -o PasswordAuthentication=no

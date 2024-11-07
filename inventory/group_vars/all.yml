@@ -1,14 +1,8 @@
-users:
-  - name: "your_name"
-    group: "your_group"
-    pass: "your_secret"
-    git:
-      author: "your_git_author_name"
-      email: "your_git_author_email@example.com"
-      lfs: "your_git_lfs_url"
-      tokens:
-        github: "your_github_account_token_can_read_and_write_ssh_key"
-    golang:
-      version:
-        - "major.minor.patch"
-      default: "major.minor.patch"
+user:
+  name: "yeluyang"
+  pass: "your_secret"
+  git:
+    author: "your_git_author_name"
+    email: "your_git_author_email@example.com"
+    tokens:
+      github: "your_github_account_token_can_read_and_write_ssh_key"
